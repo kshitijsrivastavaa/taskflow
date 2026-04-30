@@ -8,11 +8,12 @@ project_members = db.Table(
     "project_members",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
     db.Column("project_id", db.Integer, db.ForeignKey("projects.id"), primary_key=True),
-    db.Column("role", db.String(20), default="member"),  # 'admin' or 'member'
+    db.Column("role", db.String(20), default="member"),
     db.Column("joined_at", db.DateTime, default=lambda: datetime.now(timezone.utc)),
 )
 
 
+# ================= USER =================
 class User(db.Model):
     __tablename__ = "users"
 
@@ -20,18 +21,18 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(20), default="member")  # global role: 'admin' or 'member'
+    role = db.Column(db.String(20), default="member")
     avatar = db.Column(db.String(10), default="🧑")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # Relationships
     owned_projects = db.relationship("Project", back_populates="owner", foreign_keys="Project.owner_id")
     projects = db.relationship("Project", secondary=project_members, back_populates="members")
     assigned_tasks = db.relationship("Task", back_populates="assignee", foreign_keys="Task.assignee_id")
     created_tasks = db.relationship("Task", back_populates="creator", foreign_keys="Task.creator_id")
 
+    # ✅ FIXED PASSWORD HASH
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method="pbkdf2:sha256")
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -47,20 +48,20 @@ class User(db.Model):
         }
 
 
+# ================= PROJECT =================
 class Project(db.Model):
     __tablename__ = "projects"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, default="")
-    status = db.Column(db.String(30), default="active")  # active, completed, on_hold
+    status = db.Column(db.String(30), default="active")
     color = db.Column(db.String(10), default="#6366f1")
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     deadline = db.Column(db.DateTime, nullable=True)
 
-    # Relationships
     owner = db.relationship("User", back_populates="owned_projects", foreign_keys=[owner_id])
     members = db.relationship("User", secondary=project_members, back_populates="projects")
     tasks = db.relationship("Task", back_populates="project", cascade="all, delete-orphan")
@@ -77,6 +78,7 @@ class Project(db.Model):
     def to_dict(self, user_id=None):
         total = len(self.tasks)
         done = sum(1 for t in self.tasks if t.status == "done")
+
         return {
             "id": self.id,
             "name": self.name,
@@ -95,23 +97,23 @@ class Project(db.Model):
         }
 
 
+# ================= TASK =================
 class Task(db.Model):
     __tablename__ = "tasks"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(300), nullable=False)
     description = db.Column(db.Text, default="")
-    status = db.Column(db.String(30), default="todo")  # todo, in_progress, review, done
-    priority = db.Column(db.String(20), default="medium")  # low, medium, high, urgent
+    status = db.Column(db.String(30), default="todo")
+    priority = db.Column(db.String(20), default="medium")
     project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False)
     assignee_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     creator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     due_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-    tags = db.Column(db.String(300), default="")  # comma-separated
+    tags = db.Column(db.String(300), default="")
 
-    # Relationships
     project = db.relationship("Project", back_populates="tasks")
     assignee = db.relationship("User", back_populates="assigned_tasks", foreign_keys=[assignee_id])
     creator = db.relationship("User", back_populates="created_tasks", foreign_keys=[creator_id])
