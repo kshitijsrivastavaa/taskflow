@@ -1,7 +1,7 @@
 # 🚀 TaskFlow – Team Task Manager
 
 <p align="center">
-  <img src="https://via.placeholder.com/900x250?text=TaskFlow+%7C+Full+Stack+Project" alt="TaskFlow Banner"/>
+  <img src="https://raw.githubusercontent.com/kshitijsrivastavaa/taskflow/refs/heads/main/pictures/Banner.png" alt="TaskFlow Banner"/>
 </p>
 
 <p align="center">
