@@ -46,11 +46,8 @@ TaskFlow demonstrates real-world full-stack engineering:
 
 ### 📊 Dashboard
 
-![Dashboard](https://via.placeholder.com/600x350?text=Dashboard)
+![Dashboard](https://raw.githubusercontent.com/kshitijsrivastavaa/taskflow/refs/heads/main/pictures/Banner.png)
 
-### 📋 Kanban Board
-
-![Kanban](https://via.placeholder.com/600x350?text=Kanban+Board)
 
 ---
 
