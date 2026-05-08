@@ -9,6 +9,22 @@
 </p>
 
 ---
+---
+
+## 🎥 Demo Walkthrough
+
+📺 Watch the full application demo showcasing:
+
+- Authentication & JWT flow
+- Role-based access control
+- Project & task management
+- Kanban workflow
+- Dashboard analytics
+- API + Full-stack architecture overview
+
+🔗 Demo Video: https://your-demo-link-here
+
+---
 
 ## 🌐 Live Demo
 
